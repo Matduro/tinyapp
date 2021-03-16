@@ -33,8 +33,8 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+// click on the shortURL link to redirect you to the URL website (ie Amazon)
 app.get("/u/:shortURL", (req, res) => {
-  console.log(urlDatabase[req.params.shortURL]);
   if (!urlDatabase[req.params.shortURL]) {
     return res.status(404).send("404 page not found!");
   }
@@ -61,7 +61,15 @@ app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body.longURL;
   console.log(urlDatabase);
-  res.redirect(`/urls/${shortURL}`);         // Respond with 'Ok' (we will replace this)
+  res.redirect(`/urls/${shortURL}`);
+});
+
+// remove a URL
+app.post("/urls/:shortURL/delete", (req, res) => {
+  if (urlDatabase[req.params.shortURL]) {
+    delete urlDatabase[req.params.shortURL];
+    res.redirect('/urls');
+  }
 });
 
 app.listen(PORT, () => {
