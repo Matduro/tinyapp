@@ -3,6 +3,8 @@ const app = express();
 const PORT = 8080; // default port 808
 const bodyParser = require("body-parser"); // The body-parser library will convert the request body from a Buffer into string that we can read.
 app.use(bodyParser.urlencoded({extended: true}));
+const cookieParser = require('cookie-parser'); // Parse Cookie header and populate req.cookies with an object keyed by the cookie names.
+app.use(cookieParser());
 app.set("view engine", "ejs");
 
 const generateRandomString = () => {
@@ -79,6 +81,21 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortURL] = req.body.longURL;
   console.log(urlDatabase);
   res.redirect(`/urls/${shortURL}`);
+});
+
+// Login with cookies
+app.post("/login", (req, res) => {
+  let username = req.body.username;
+  res.cookie('username', username);
+  // let password = req.body.password;
+  res.redirect('/urls');
+});
+
+// logout, and remove cookies
+app.post("/logout", (req, res) => {
+  // ('Signed Cookies: ', req.signedCookies)
+  res.clearCookie('username');
+  res.redirect('/urls');
 });
 
 app.listen(PORT, () => {
