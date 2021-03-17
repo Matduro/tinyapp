@@ -1,15 +1,26 @@
-const validateUser = (email, password, userDB) => {
-  // for (const userObj of userDB) {
-  //   if (userObj.email === email) {
+/* const validateUser = (email, password, userDB) => {
+  for (const userObj in userDB) {
+    if (userObj.email === email) {
+      return { user: null, error: "email" };
+    }
+    else return { user: currentUser, error: null };
+  }
+} */
+// userDB.filter(userObj => userObj.email === email)
+const currentUser = (userEmail, userDB) => {
+  for (const currentID in userDB) {
+    console.log(`the userEmail: ${userEmail}`);
+    console.log(`the currentID: ${currentID}`);
+    console.log(`the currentIDemail: ${currentID['email']}`);
+    if (userDB[currentID]['email'] === userEmail) {
+      return true;
+    }
+  }
+  return false;
+};
 
-  //   }
-  // }
 
-  // userDB.filter(userObj => userObj.email === email)
-  const currentUser = userDB.find(userObj => userObj.email === email);
-
-
-  // const currentUser = userDB[email]
+/*   const currentUser = userDB[email]
   if (currentUser) {
     if (currentUser.password === password) {
       // successful login
@@ -22,28 +33,30 @@ const validateUser = (email, password, userDB) => {
     // failed at email
     return { user: null, error: "email" };
   }
+}; */
+
+
+const generateRandomString = () => {
+  return Math.random().toString(36).substring(6);
 };
 
+
 const createUser = (userInfo, userDB) => {
-  const { name, email, icon, password } = userInfo;
-  const { user, error } = validateUser(email, password, userDB);
-  if (error === "email") {
-    // const newUser = {
-    //   email,
-    //   name,
-    //   password,
-    //   icon
-    // }
-    userDB.push(userInfo);
-    return email;
+  const { email, password } = userInfo;
+  const existingEmail = currentUser(email, userDB);
+  if (!existingEmail) {
+    const userID = generateRandomString();
+    userDB[userID] = userInfo;
+    return { email, userID };
   } else {
     return null;
   }
 };
 
-const findUser = (email, userDB) => {
+/* const findUser = (email, userDB) => {
   const currentUser = userDB.find(userObj => userObj.email === email);
 
   return currentUser;
-};
-module.exports = { validateUser, createUser, findUser };
+}; */
+
+module.exports = { createUser, generateRandomString, currentUser };

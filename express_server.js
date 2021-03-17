@@ -5,43 +5,21 @@ const bodyParser = require("body-parser"); // The body-parser library will conve
 app.use(bodyParser.urlencoded({extended: true}));
 const cookieParser = require('cookie-parser'); // Parse Cookie header and populate req.cookies with an object keyed by the cookie names.
 app.use(cookieParser());
-const { validateUser, createUser, findUser } = require('./helpers/userFunctions');
+const { createUser, currentUser, generateRandomString} = require('./helpers/userFunctions');
 app.set("view engine", "ejs");
 
-const userDatabaseIsh = {
-  "akaoko1": {
-    id: "akaoko1",
-    name: "Dimitri Ivanovich Mendeleiv",
-    email: "periodic@table.com",
-    password: "molecule"
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
   },
-  "ala0pla1": {
-    id: "ala0pla1",
-    name: "Pequeño Pollo de la Pampa",
-    email: "pockpock@chicken.com",
-    password: "egg"
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
   }
 };
-
-const userArrayOfDestiny = [
-  {
-    name: "Dimitri Ivanovich Mendeleiv",
-    email: "periodic@table.com",
-    password: "molecule",
-    icon: "🥼"
-  },
-  {
-    name: "Pequeño Pollo de la Pampa",
-    email: "pockpock@chicken.com",
-    password: "egg",
-    icon: "🐔"
-  }
-];
-
-const generateRandomString = () => {
-  return Math.random().toString(36).substring(6);
-};
-
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -54,11 +32,15 @@ app.get("/", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies["username"]};
+  const templateVars = { urls: urlDatabase, username: req.cookies["email"]};
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
+  if (!req.cookies['username']) {
+    res.redirect('/login');
+    return;
+  }
   const templateVars = { username: req.cookies["username"] };
   res.render("urls_new", templateVars);
 });
@@ -115,25 +97,32 @@ app.post("/urls", (req, res) => {
 
 // Login with cookies
 app.post("/login", (req, res) => {
-  let username = req.body.username;
-  res.cookie('username', username);
-  // let password = req.body.password;
-  res.redirect('/urls');
+  const { email, password }  = req.body;
+  const current = currentUser(email, users);
+  if (current) {
+    console.log(req.body);
+    res.cookie('email', email);
+    // let password = req.body.password;
+    res.redirect('/urls');
+  } else {
+    return res.status(404).send("404 page not found!");
+  }
 });
 
 // logout, and remove cookies
 app.post("/logout", (req, res) => {
   // ('Signed Cookies: ', req.signedCookies)
-  res.clearCookie('username');
+  res.clearCookie('email');
   res.redirect('/urls');
 });
 
 // register new user
 app.post('/register', (req, res) => {
-  const userEmail = createUser(req.body, userArrayOfDestiny);
-  if (userEmail) {
-    res.cookie('email', userEmail);
-    res.redirect('/');
+  // user ID : enerateRandomString();
+  const { email, userID } = createUser(req.body, users);
+  if (email) {
+    res.cookie('email', email);
+    res.redirect('/urls');
   } else {
     res.send('error ! user exists');
   }
