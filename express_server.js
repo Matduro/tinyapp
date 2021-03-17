@@ -5,7 +5,38 @@ const bodyParser = require("body-parser"); // The body-parser library will conve
 app.use(bodyParser.urlencoded({extended: true}));
 const cookieParser = require('cookie-parser'); // Parse Cookie header and populate req.cookies with an object keyed by the cookie names.
 app.use(cookieParser());
+const { validateUser, createUser, findUser } = require('./helpers/userFunctions');
 app.set("view engine", "ejs");
+
+const userDatabaseIsh = {
+  "akaoko1": {
+    id: "akaoko1",
+    name: "Dimitri Ivanovich Mendeleiv",
+    email: "periodic@table.com",
+    password: "molecule"
+  },
+  "ala0pla1": {
+    id: "ala0pla1",
+    name: "Pequeño Pollo de la Pampa",
+    email: "pockpock@chicken.com",
+    password: "egg"
+  }
+};
+
+const userArrayOfDestiny = [
+  {
+    name: "Dimitri Ivanovich Mendeleiv",
+    email: "periodic@table.com",
+    password: "molecule",
+    icon: "🥼"
+  },
+  {
+    name: "Pequeño Pollo de la Pampa",
+    email: "pockpock@chicken.com",
+    password: "egg",
+    icon: "🐔"
+  }
+];
 
 const generateRandomString = () => {
   return Math.random().toString(36).substring(6);
@@ -18,7 +49,8 @@ const urlDatabase = {
 };
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  const templateVars = { urls: urlDatabase, username: req.cookies["username"]};
+  res.render("urls_index", templateVars);
 });
 
 app.get("/urls", (req, res) => {
@@ -44,6 +76,17 @@ app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
 });
+
+// Registration page
+app.get('/register', (req, res) => {
+  // const user = findUser(req.cookies.email, userArrayOfDestiny);
+  const templateVars = {
+    username: req.body.username
+  };
+  res.cookie('username', templateVars.username);
+  res.render('register', templateVars);
+});
+
 
 // remove a URL
 app.post("/urls/:shortURL/delete", (req, res) => {
@@ -83,6 +126,18 @@ app.post("/logout", (req, res) => {
   // ('Signed Cookies: ', req.signedCookies)
   res.clearCookie('username');
   res.redirect('/urls');
+});
+
+// register new user
+app.post('/register', (req, res) => {
+  const userEmail = createUser(req.body, userArrayOfDestiny);
+  if (userEmail) {
+    res.cookie('email', userEmail);
+    res.redirect('/');
+  } else {
+    res.send('error ! user exists');
+  }
+
 });
 
 app.listen(PORT, () => {
