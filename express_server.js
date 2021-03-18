@@ -5,7 +5,7 @@ const bodyParser = require("body-parser"); // The body-parser library will conve
 app.use(bodyParser.urlencoded({extended: true}));
 const cookieParser = require('cookie-parser'); // Parse Cookie header and populate req.cookies with an object keyed by the cookie names.
 app.use(cookieParser());
-const { createUser, currentUser, generateRandomString, validInput, validPassword } = require('./helpers/userFunctions');
+const { createUser, currentUser, generateRandomString, validInput, validPassword, urlsForUser } = require('./helpers/userFunctions');
 app.set("view engine", "ejs");
 
 const users = {
@@ -33,6 +33,10 @@ app.get("/", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
+  if (!req.cookies['user_id']) {
+    res.redirect('/login');
+    return;
+  }
   const templateVars = { urls: urlDatabase, username: req.cookies.user_id};
   res.render("urls_index", templateVars);
 });

@@ -8,6 +8,17 @@
   }
 }; */
 
+const urlsForUser = (id, userDB) => {
+  let userURLs = {};
+  // return object which contains the objects that contain userID
+  for (const key in userDB) {
+    if (userDB[key].userID === id) {
+      userURLs[key] = userDB[key];
+    }
+  }
+  return userURLs;
+};
+
 const validPassword = (userEmail, userPassword, userDB) => {
   
   for (const currentID in userDB) {
@@ -77,4 +88,4 @@ const createUser = (userInfo, userDB) => {
   return currentUser;
 }; */
 
-module.exports = { createUser, generateRandomString, currentUser, validInput, validPassword };
+module.exports = { createUser, generateRandomString, currentUser, validInput, validPassword, urlsForUser };
