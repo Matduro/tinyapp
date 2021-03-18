@@ -3,7 +3,7 @@ const app = express();
 const PORT = 8080; // default port 808
 const bodyParser = require("body-parser"); // The body-parser library will convert the request body from a Buffer into string that we can read.
 app.use(bodyParser.urlencoded({extended: true}));
-const { validSession, createUser, currentUser, generateRandomString, validInput, validPassword, urlsForUser } = require('./helpers/userFunctions');
+const { validSession, createUser, getUserByEmail, generateRandomString, validInput, validPassword, urlsForUser } = require('./helpers/helpers.js');
 const bcrypt = require('bcrypt');
 const morgan = require('morgan');
 const cookieSession = require('cookie-session');
@@ -123,8 +123,8 @@ app.post("/urls", validSession, (req, res) => {
 // Login with cookies
 app.post("/login", (req, res) => {
   const { email, password }  = req.body;
-  const current = currentUser(email, users);
-  if (current) {
+  const { userEmail, currentID } = getUserByEmail(email, users);
+  if (userEmail && currentID) {
     const userID = validPassword(email, password, users);
   
     if (userID) {
@@ -151,8 +151,7 @@ app.post('/register', (req, res) => {
   if (!validInput(req.body)) {
     res.send('error 400, email and/or password error');
   }
-  // const currentUser = validateUser(req.body, users);
-  
+
   const { email, userID } = createUser(req.body, users);
   if (email) {
     req.session['user_id'] =  userID;

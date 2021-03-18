@@ -43,14 +43,14 @@ const validInput = (object) => {
   }
 };
 // userDB.filter(userObj => userObj.email === email)
-const currentUser = (userEmail, userDB) => {
+const getUserByEmail = (userEmail, userDB) => {
   
   for (const currentID in userDB) {
     if (userDB[currentID]['email'] === userEmail) {
-      return true;
+      return { userEmail, currentID };
     }
   }
-  return false;
+  return { 'userEmail': null, 'currentID': null };
 };
 
 
@@ -77,8 +77,8 @@ const generateRandomString = () => {
 
 const createUser = (userInfo, userDB) => {
   const { email, password } = userInfo;
-  const existingEmail = currentUser(email, userDB);
-  if (!existingEmail) {
+  const { userEmail, currentID } = getUserByEmail(email, userDB);
+  if (!userEmail && !currentID) {
     const userID = generateRandomString();
     const cryptPass = bcrypt.hashSync(password, saltRounds);
     userDB[userID] = { 'id': userID, 'email': email, 'password': cryptPass};
@@ -105,4 +105,4 @@ const validSession = (req, res, next) => {
   return currentUser;
 }; */
 
-module.exports = { validSession, createUser, generateRandomString, currentUser, validInput, validPassword, urlsForUser };
+module.exports = { validSession, createUser, generateRandomString, getUserByEmail, validInput, validPassword, urlsForUser };
