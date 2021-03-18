@@ -5,7 +5,7 @@ const bodyParser = require("body-parser"); // The body-parser library will conve
 app.use(bodyParser.urlencoded({extended: true}));
 const cookieParser = require('cookie-parser'); // Parse Cookie header and populate req.cookies with an object keyed by the cookie names.
 app.use(cookieParser());
-const { createUser, currentUser, generateRandomString} = require('./helpers/userFunctions');
+const { createUser, currentUser, generateRandomString, validInput} = require('./helpers/userFunctions');
 app.set("view engine", "ejs");
 
 const users = {
@@ -118,13 +118,18 @@ app.post("/logout", (req, res) => {
 
 // register new user
 app.post('/register', (req, res) => {
-  // user ID : enerateRandomString();
-  const { email, userID } = createUser(req.body, users);
-  if (email) {
-    res.cookie('email', email);
+
+  if (!validInput(req.body)) {
+    res.send('error 400, email and/or password error');
+  }
+  // const currentUser = validateUser(req.body, users);
+  
+  const { newEmail, userID } = createUser(req.body, users);
+  if (newEmail) {
+    res.cookie('email', newEmail);
     res.redirect('/urls');
   } else {
-    res.send('error ! user exists');
+    res.send('error 400, user exists');
   }
 
 });

@@ -1,17 +1,25 @@
-/* const validateUser = (email, password, userDB) => {
-  for (const userObj in userDB) {
-    if (userObj.email === email) {
+/* const validateUser = (userInfo, userDB) => {
+  const { email, password } =
+  && userDB[currentID][email]
+  for (const currentID in userDB) {
+    if (userDB[currentID][email] === email) {
       return { user: null, error: "email" };
-    }
-    else return { user: currentUser, error: null };
+    } else return { user: currentUser, error: null };
   }
-} */
+}; */
+
+const validInput = (object) => {
+  const { email, password } = object;
+  if (email.length === 0 || password.length === 0) {
+    return false;
+  } else if (email.length > 0 || password.length > 0) {
+    return true;
+  }
+};
 // userDB.filter(userObj => userObj.email === email)
 const currentUser = (userEmail, userDB) => {
+  
   for (const currentID in userDB) {
-    console.log(`the userEmail: ${userEmail}`);
-    console.log(`the currentID: ${currentID}`);
-    console.log(`the currentIDemail: ${currentID['email']}`);
     if (userDB[currentID]['email'] === userEmail) {
       return true;
     }
@@ -42,12 +50,12 @@ const generateRandomString = () => {
 
 
 const createUser = (userInfo, userDB) => {
-  const { email, password } = userInfo;
-  const existingEmail = currentUser(email, userDB);
+  const { newEmail, password } = userInfo;
+  const existingEmail = currentUser(newEmail, userDB);
   if (!existingEmail) {
     const userID = generateRandomString();
     userDB[userID] = userInfo;
-    return { email, userID };
+    return { newEmail, userID };
   } else {
     return null;
   }
@@ -59,4 +67,4 @@ const createUser = (userInfo, userDB) => {
   return currentUser;
 }; */
 
-module.exports = { createUser, generateRandomString, currentUser };
+module.exports = { createUser, generateRandomString, currentUser, validInput };
