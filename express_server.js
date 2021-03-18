@@ -5,7 +5,7 @@ const bodyParser = require("body-parser"); // The body-parser library will conve
 app.use(bodyParser.urlencoded({extended: true}));
 const cookieParser = require('cookie-parser'); // Parse Cookie header and populate req.cookies with an object keyed by the cookie names.
 app.use(cookieParser());
-const { createUser, currentUser, generateRandomString, validInput} = require('./helpers/userFunctions');
+const { createUser, currentUser, generateRandomString, validInput, validPassword } = require('./helpers/userFunctions');
 app.set("view engine", "ejs");
 
 const users = {
@@ -27,26 +27,26 @@ const urlDatabase = {
 };
 
 app.get("/", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies["username"]};
+  const templateVars = { urls: urlDatabase, username: req.cookies.user_id};
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies["email"]};
+  const templateVars = { urls: urlDatabase, username: req.cookies.user_id};
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  if (!req.cookies['username']) {
+  if (!req.cookies['user_id']) {
     res.redirect('/login');
     return;
   }
-  const templateVars = { username: req.cookies["username"] };
+  const templateVars = { username: req.cookies.user_id };
   res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: req.cookies["username"] };
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL],  username: req.cookies.user_id };
   res.render("urls_show", templateVars);
 });
 
@@ -62,19 +62,18 @@ app.get("/u/:shortURL", (req, res) => {
 // Registration page
 app.get('/register', (req, res) => {
   // const user = findUser(req.cookies.email, userArrayOfDestiny);
+  console.log(req);
   const templateVars = {
-    username: req.body.username
+    username: req.cookies.user_id
   };
-  res.cookie('username', templateVars.username);
   res.render('register', templateVars);
 });
 
 // Login page
 app.get('/login', (req, res) => {
   const templateVars = {
-    username: req.body.username
+    username: req.cookies.user_id
   };
-  res.cookie('username', templateVars.username);
   res.render('login', templateVars);
 });
 
@@ -109,19 +108,22 @@ app.post("/login", (req, res) => {
   const { email, password }  = req.body;
   const current = currentUser(email, users);
   if (current) {
-    console.log(req.body);
-    res.cookie('email', email);
-    // let password = req.body.password;
-    res.redirect('/urls');
+    const userID = validPassword(email, password, users);
+    if (userID) {
+      res.cookie('user_id', userID);
+      res.redirect('/urls');
+    } else {
+      return res.status(403).send("403 invalid password!");
+    }
   } else {
-    return res.status(404).send("404 page not found!");
+    return res.status(403).send("403 e-mail address not found!");
   }
 });
 
 // logout, and remove cookies
 app.post("/logout", (req, res) => {
   // ('Signed Cookies: ', req.signedCookies)
-  res.clearCookie('email');
+  res.clearCookie('user_id');
   res.redirect('/urls');
 });
 
@@ -133,9 +135,10 @@ app.post('/register', (req, res) => {
   }
   // const currentUser = validateUser(req.body, users);
   
-  const { newEmail, userID } = createUser(req.body, users);
-  if (newEmail) {
-    res.cookie('email', newEmail);
+  const { email, userID } = createUser(req.body, users);
+  console.log(req.body);
+  if (email) {
+    res.cookie('user_id', userID);
     res.redirect('/urls');
   } else {
     res.send('error 400, user exists');

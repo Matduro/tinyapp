@@ -10,13 +10,15 @@
 </head>
 <body>
   <%- include('partials/_header') %> 
-    <section>
+    <section style="margin: 1em">
+      <h3>Create Account</h3>
       <form action="/register" method="POST">
-        <div class="form-group" style="width: 20%; margin: auto; padding: 3em;">
-          <label for="register">Register a new account:</label>
-         <input type="text" name="email" placeholder="Type your email" class="form-control">
-          <input type="password" name="password" placeholder="Type your password" class="form-control">
-        <button type="submit" class="btn btn-success">Register!</button>
+        <div class="form-group" style="">
+          <label for="register">Email address:</label style="margin: 1em">
+         <input type="text" name="email" placeholder="Enter email" class="form-control" style="width: 300px">
+         <label for="register">Password:</label style="margin: 1em">
+          <input type="password" name="password" placeholder="Password" class="form-control" style="width: 300px">
+        <button type="submit" class="btn btn-primary">Register!</button>
       </div>
       </form>
     </section>

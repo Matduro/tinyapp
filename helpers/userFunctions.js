@@ -8,6 +8,16 @@
   }
 }; */
 
+const validPassword = (userEmail, userPassword, userDB) => {
+  
+  for (const currentID in userDB) {
+    if (userDB[currentID]['email'] === userEmail && userDB[currentID]['password'] === userPassword) {
+      return currentID;
+    }
+  }
+  return null;
+};
+
 const validInput = (object) => {
   const { email, password } = object;
   if (email.length === 0 || password.length === 0) {
@@ -50,12 +60,12 @@ const generateRandomString = () => {
 
 
 const createUser = (userInfo, userDB) => {
-  const { newEmail, password } = userInfo;
-  const existingEmail = currentUser(newEmail, userDB);
+  const { email, password } = userInfo;
+  const existingEmail = currentUser(email, userDB);
   if (!existingEmail) {
     const userID = generateRandomString();
     userDB[userID] = userInfo;
-    return { newEmail, userID };
+    return { email, userID };
   } else {
     return null;
   }
@@ -67,4 +77,4 @@ const createUser = (userInfo, userDB) => {
   return currentUser;
 }; */
 
-module.exports = { createUser, generateRandomString, currentUser, validInput };
+module.exports = { createUser, generateRandomString, currentUser, validInput, validPassword };
