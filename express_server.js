@@ -69,6 +69,15 @@ app.get('/register', (req, res) => {
   res.render('register', templateVars);
 });
 
+// Login page
+app.get('/login', (req, res) => {
+  const templateVars = {
+    username: req.body.username
+  };
+  res.cookie('username', templateVars.username);
+  res.render('login', templateVars);
+});
+
 
 // remove a URL
 app.post("/urls/:shortURL/delete", (req, res) => {
