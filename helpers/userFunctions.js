@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 /* const validateUser = (userInfo, userDB) => {
   const { email, password } =
   && userDB[currentID][email]
@@ -12,7 +14,6 @@ const urlsForUser = (id, userDB) => {
   let userURLs = {};
   // return object which contains the objects that contain userID
   for (const key in userDB) {
-    console.log(userDB[key].userID);
     if (userDB[key].userID === id) {
       userURLs[key] = userDB[key];
     }
@@ -21,10 +22,13 @@ const urlsForUser = (id, userDB) => {
 };
 
 const validPassword = (userEmail, userPassword, userDB) => {
-  
+
   for (const currentID in userDB) {
-    if (userDB[currentID]['email'] === userEmail && userDB[currentID]['password'] === userPassword) {
-      return currentID;
+    if (userDB[currentID]['email'] === userEmail) {
+      const hashedPass = userDB[currentID].password;
+      if (bcrypt.compareSync(userPassword, hashedPass)) {
+        return currentID;
+      }
     }
   }
   return null;
@@ -76,7 +80,9 @@ const createUser = (userInfo, userDB) => {
   const existingEmail = currentUser(email, userDB);
   if (!existingEmail) {
     const userID = generateRandomString();
-    userDB[userID] = userInfo;
+    const cryptPass = bcrypt.hashSync(password, saltRounds);
+    userDB[userID] = { 'id': userID, 'email': email, 'password': cryptPass};
+
     return { email, userID };
   } else {
     return null;

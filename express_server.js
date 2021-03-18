@@ -6,18 +6,23 @@ app.use(bodyParser.urlencoded({extended: true}));
 const cookieParser = require('cookie-parser'); // Parse Cookie header and populate req.cookies with an object keyed by the cookie names.
 app.use(cookieParser());
 const { createUser, currentUser, generateRandomString, validInput, validPassword, urlsForUser } = require('./helpers/userFunctions');
+const bcrypt = require('bcrypt');
+const morgan = require('morgan');
+const cookieSession = require('cookie-session');
+const saltRounds = 10;
+
 app.set("view engine", "ejs");
 
 const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+    password: bcrypt.hashSync("purple-monkey-dinosaur", saltRounds),
   },
   "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk"
+    password: bcrypt.hashSync("dishwasher-funk", saltRounds),
   }
 };
 
@@ -37,7 +42,6 @@ app.get("/urls", (req, res) => {
     res.redirect('/login');
     return;
   }
-  console.log(req.cookies.user_id);
   const myURLs = urlsForUser(req.cookies.user_id, urlDatabase);
   const templateVars = { urls: myURLs, username: req.cookies.user_id};
   res.render("urls_index", templateVars);
@@ -121,7 +125,6 @@ app.post("/urls", (req, res) => {
   // console.log(req.body);  // Log the POST request body to the console, get an object of { longURL: url }
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = { longURL: req.body.longURL, userID: req.cookies.user_id };
-  console.log(urlDatabase);
   res.redirect(`/urls/${shortURL}`);
 });
 
@@ -131,6 +134,7 @@ app.post("/login", (req, res) => {
   const current = currentUser(email, users);
   if (current) {
     const userID = validPassword(email, password, users);
+  
     if (userID) {
       res.cookie('user_id', userID);
       res.redirect('/urls');
