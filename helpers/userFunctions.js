@@ -12,6 +12,7 @@ const urlsForUser = (id, userDB) => {
   let userURLs = {};
   // return object which contains the objects that contain userID
   for (const key in userDB) {
+    console.log(userDB[key].userID);
     if (userDB[key].userID === id) {
       userURLs[key] = userDB[key];
     }

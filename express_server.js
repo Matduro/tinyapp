@@ -37,7 +37,9 @@ app.get("/urls", (req, res) => {
     res.redirect('/login');
     return;
   }
-  const templateVars = { urls: urlDatabase, username: req.cookies.user_id};
+  console.log(req.cookies.user_id);
+  const myURLs = urlsForUser(req.cookies.user_id, urlDatabase);
+  const templateVars = { urls: myURLs, username: req.cookies.user_id};
   res.render("urls_index", templateVars);
 });
 
@@ -85,6 +87,7 @@ app.get('/login', (req, res) => {
 // remove a URL
 app.post("/urls/:shortURL/delete", (req, res) => {
   if (!req.cookies['user_id']) {
+
     res.redirect('/login');
     return;
   }
