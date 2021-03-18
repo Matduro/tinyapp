@@ -89,10 +89,20 @@ const createUser = (userInfo, userDB) => {
   }
 };
 
+
+const validSession = (req, res, next) => {
+  if (!req.session['user_id']) {
+
+    res.redirect('/login');
+    return;
+  }
+  next();
+};
+
 /* const findUser = (email, userDB) => {
   const currentUser = userDB.find(userObj => userObj.email === email);
 
   return currentUser;
 }; */
 
-module.exports = { createUser, generateRandomString, currentUser, validInput, validPassword, urlsForUser };
+module.exports = { validSession, createUser, generateRandomString, currentUser, validInput, validPassword, urlsForUser };

@@ -3,7 +3,7 @@ const app = express();
 const PORT = 8080; // default port 808
 const bodyParser = require("body-parser"); // The body-parser library will convert the request body from a Buffer into string that we can read.
 app.use(bodyParser.urlencoded({extended: true}));
-const { createUser, currentUser, generateRandomString, validInput, validPassword, urlsForUser } = require('./helpers/userFunctions');
+const { validSession, createUser, currentUser, generateRandomString, validInput, validPassword, urlsForUser } = require('./helpers/userFunctions');
 const bcrypt = require('bcrypt');
 const morgan = require('morgan');
 const cookieSession = require('cookie-session');
@@ -13,6 +13,7 @@ const saltRounds = 10;
 app.use(morgan('short'));
 
 app.set("view engine", "ejs");
+
 
 const users = {
   "userRandomID": {
@@ -43,21 +44,15 @@ app.get("/", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-app.get("/urls", (req, res) => {
-  if (!req.session['user_id']) {
-    res.redirect('/login');
-    return;
-  }
+app.get("/urls", validSession, (req, res) => {
+
   const myURLs = urlsForUser(req.session['user_id'], urlDatabase);
   const templateVars = { urls: myURLs, username: req.session['user_id']};
   res.render("urls_index", templateVars);
 });
 
-app.get("/urls/new", (req, res) => {
-  if (!req.session['user_id']) {
-    res.redirect('/login');
-    return;
-  }
+app.get("/urls/new", validSession, (req, res) => {
+
   const templateVars = { username: req.session['user_id'] };
   res.render("urls_new", templateVars);
 });
@@ -94,12 +89,7 @@ app.get('/login', (req, res) => {
 
 
 // remove a URL
-app.post("/urls/:shortURL/delete", (req, res) => {
-  if (!req.session['user_id']) {
-
-    res.redirect('/login');
-    return;
-  }
+app.post("/urls/:shortURL/delete", validSession, (req, res) => {
   if (urlDatabase[req.params.shortURL]) {
     delete urlDatabase[req.params.shortURL];
     res.redirect('/urls');
@@ -122,11 +112,8 @@ app.post("/urls/:shortURL/edit", (req, res) => {
 });
 
 // Add a new URL
-app.post("/urls", (req, res) => {
-  if (!req.session['user_id']) {
-    res.redirect('/login');
-    return;
-  }
+app.post("/urls", validSession, (req, res) => {
+
   // console.log(req.body);  // Log the POST request body to the console, get an object of { longURL: url }
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = { longURL: req.body.longURL, userID: req.session['user_id'] };
