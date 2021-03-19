@@ -46,22 +46,22 @@ app.get("/", (req, res) => {
 
 // get to urls_index page
 app.get("/urls", validSession, (req, res) => {
-
+  const user = users[req.session['user_id']];
   const myURLs = urlsForUser(req.session['user_id'], urlDatabase);
-  const templateVars = { urls: myURLs, username: req.session['user_id']};
+  const templateVars = { 'urls': myURLs, 'user': user};
   res.render("urls_index", templateVars);
 });
 
 // get to new longURL input
 app.get("/urls/new", validSession, (req, res) => {
-
-  const templateVars = { username: req.session['user_id'] };
+  const user = users[req.session['user_id']];
+  const templateVars = { user: user };
   res.render("urls_new", templateVars);
 });
 
 // to to specific edit page of a short URL
 app.get("/urls/:shortURL", validSession, (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL,  username: req.session['user_id'] };
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL,  user: users[req.session['user_id']] };
   res.render("urls_show", templateVars);
 });
 
@@ -77,7 +77,7 @@ app.get("/u/:shortURL", (req, res) => {
 // Registration page
 app.get('/register', (req, res) => {
   const templateVars = {
-    username: req.session['user_id']
+    user: users[req.session['user_id']]
   };
   res.render('register', templateVars);
 });
@@ -85,7 +85,7 @@ app.get('/register', (req, res) => {
 // Login page
 app.get('/login', (req, res) => {
   const templateVars = {
-    username: req.session['user_id']
+    user: users[req.session['user_id']]
   };
   res.render('login', templateVars);
 });
@@ -105,15 +105,10 @@ app.post("/urls/:shortURL/delete", validSession, (req, res) => {
 });
 
 // modify a longURL
-app.post("/urls/:shortURL/edit", (req, res) => {
+app.post("/urls/:shortURL/edit", validSession, (req, res) => {
   const userID = req.session['user_id'];
-  const longURL = req.body;
-  if (!userID) {
-    res.redirect('/login');
-    return;
-  }
+  const longURL = req.body.longURL;
   if (urlDatabase[req.params.shortURL]) {
-
     urlDatabase[req.params.shortURL] = { longURL, userID };
     res.redirect('/urls');
   }
