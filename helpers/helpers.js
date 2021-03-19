@@ -85,7 +85,7 @@ const createUser = (userInfo, userDB) => {
 
     return { email, userID };
   } else {
-    return null;
+    return { 'userEmail': null, 'currentID': null };
   }
 };
 
