@@ -1,18 +1,9 @@
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-/* const validateUser = (userInfo, userDB) => {
-  const { email, password } =
-  && userDB[currentID][email]
-  for (const currentID in userDB) {
-    if (userDB[currentID][email] === email) {
-      return { user: null, error: "email" };
-    } else return { user: currentUser, error: null };
-  }
-}; */
 
+// returns object of the URL database for objects matching the users account only.
 const urlsForUser = (id, userDB) => {
   let userURLs = {};
-  // return object which contains the objects that contain userID
   for (const key in userDB) {
     if (userDB[key].userID === id) {
       userURLs[key] = userDB[key];
@@ -21,8 +12,8 @@ const urlsForUser = (id, userDB) => {
   return userURLs;
 };
 
+// Validate that the password is correct
 const validPassword = (userEmail, userPassword, userDB) => {
-
   for (const currentID in userDB) {
     if (userDB[currentID]['email'] === userEmail) {
       const hashedPass = userDB[currentID].password;
@@ -34,6 +25,7 @@ const validPassword = (userEmail, userPassword, userDB) => {
   return null;
 };
 
+// validates that email and password have a value.
 const validInput = (object) => {
   const { email, password } = object;
   if (email.length === 0 || password.length === 0) {
@@ -42,9 +34,9 @@ const validInput = (object) => {
     return true;
   }
 };
-// userDB.filter(userObj => userObj.email === email)
+
+// get user email and ID if it's in the system.
 const getUserByEmail = (userEmail, userDB) => {
-  
   for (const currentID in userDB) {
     if (userDB[currentID]['email'] === userEmail) {
       return { userEmail, currentID };
@@ -53,28 +45,12 @@ const getUserByEmail = (userEmail, userDB) => {
   return { 'userEmail': null, 'currentID': null };
 };
 
-
-/*   const currentUser = userDB[email]
-  if (currentUser) {
-    if (currentUser.password === password) {
-      // successful login
-      return { user: currentUser, error: null };
-    } else {
-      // failed at password
-      return { user: null, error: "password" };
-    }
-  } else {
-    // failed at email
-    return { user: null, error: "email" };
-  }
-}; */
-
-
+// generates a random string for IDs
 const generateRandomString = () => {
   return Math.random().toString(36).substring(6);
 };
 
-
+// create a new user if it's not already in the database
 const createUser = (userInfo, userDB) => {
   const { email, password } = userInfo;
   const { userEmail, currentID } = getUserByEmail(email, userDB);
@@ -89,7 +65,7 @@ const createUser = (userInfo, userDB) => {
   }
 };
 
-
+// checks the cookies for a valid/loged in session. Next if valid, else it redirects to login.
 const validSession = (req, res, next) => {
   if (!req.session['user_id']) {
 
@@ -98,11 +74,5 @@ const validSession = (req, res, next) => {
   }
   next();
 };
-
-/* const findUser = (email, userDB) => {
-  const currentUser = userDB.find(userObj => userObj.email === email);
-
-  return currentUser;
-}; */
 
 module.exports = { validSession, createUser, generateRandomString, getUserByEmail, validInput, validPassword, urlsForUser };
