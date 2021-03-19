@@ -4,9 +4,9 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 
-![Main URL display page for current user](#)
-![Long URl modification && shortURL link rediction page](#)
-![Compressed view](#)
+![Main URL display page for current user](https://github.com/Matduro/tinyapp/blob/main/docs/urlsPage.png)
+![Long URl modification && shortURL link rediction page](https://github.com/Matduro/tinyapp/blob/main/docs/editRedirectPage.png)
+![Compressed view](https://github.com/Matduro/tinyapp/blob/main/docs/compressedPage.pngs)
 
 ## Dependencies
 
