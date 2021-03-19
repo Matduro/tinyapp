@@ -11,24 +11,27 @@
        
       </div>
     </div>
-    <div>
-    <% if (username) { %>
-      <form action="/logout" method="POST" style="display: flex; justify-content: center; align-items: center">
-          <p style="margin-right: 1em"></p><%= username %></p>
-        <button type="submit" class="btn btn-outline-dark" style="margin-left: 1em">Logout</button>
-        </form>
-    <% } else { %>
-      <div>
-      <form action="/login" method="GET">
-        <button type="submit" class="btn btn-outline-dark">Login</button>
-      </form>
-    </div>
-    <div>
-      <form action="/register" method="GET">
-        <button type="submit" class="btn btn-outline-dark">Register</button>
-      </form>
-    </div>
-    <% } %>
-  </div>
+        <div>
+        <% if (username) { %>
+          <form action="/logout" method="POST" style="display: flex; justify-content: center; align-items: center">
+              <p style="margin-right: 1em"></p><%= username %></p>
+            <button type="submit" class="btn btn-outline-dark" style="margin-left: 1em">Logout</button>
+            </form>
+        <% } else { %>
+          <section style="display: flex; justify-content: center; align-items: center">
+            <div>
+              <form action="/login" method="GET">
+                <button type="submit" class="btn btn-outline-dark" style= "padding: 0.5em; margin: 0.3em">Login</button>
+              </form>
+            </div>
+        
+            <div>
+              <form action="/register" method="GET">
+                <button type="submit" class="btn btn-outline-dark" style= "padding: 0.5em; margin: 0.3em">Register</button>
+              </form>
+            </div>
+            <% } %>
+        </section>
+      </div>
   </nav>
 </header>
